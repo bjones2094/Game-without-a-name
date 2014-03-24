@@ -1,3 +1,8 @@
+/*
+ * Controller handles all inputs from the user
+ * Currently only handles mouse clicks using MouseListener interface
+ */
+
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 

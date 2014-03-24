@@ -1,3 +1,8 @@
+/*
+ * Target class is a child of the Sprite class, and is the main objective of the game.
+ * Targets should be clicked before they disappear.
+ */
+
 import java.awt.Image;
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -21,6 +26,8 @@ public class Target extends Sprite {
 	public GameView gameView;
 	
 	public Target(int x, int y, GameView view) {
+		// Statically loads all images needed for targets on creation of first target
+	
 		try {
 			if(this.lowImage == null) {
 				this.lowImage = ImageIO.read(new File("img/targetLow.png"));
@@ -61,6 +68,8 @@ public class Target extends Sprite {
 	public void update() {
 		this.frameCounter++;
 		
+		// Targets move faster as they are clicked more (minimum 10ms between switches)
+		
 		this.timeBeforeMove = 90 - this.timesTouched * 8;
 			
 		if(this.timeBeforeMove < 10) {
@@ -72,8 +81,13 @@ public class Target extends Sprite {
 		}
 	}
 	
+	// Called when user successfully clicks target
+	
 	public void isTouched() {
 		this.timesTouched++;
+		
+		// Targets change color the more they are clicked
+		
 		if(this.timesTouched == 3) {
 			this.setImage(this.midImage);
 		}
@@ -86,11 +100,15 @@ public class Target extends Sprite {
 		this.relocate();
 	}
 	
+	// Moves target to new location and resets its counter
+	
 	public void relocate() {
 		this.frameCounter = 0;
 		this.setPos(this.rand.nextInt(this.gameView.getWidth() - this.width), this.rand.nextInt(this.gameView.getHeight() - this.height));
 		this.avoidTargetCollision();
 	}
+	
+	// Attempt at preventing target collisions (needs to be fixed)
 	
 	public void avoidTargetCollision() {
 		Iterator<Target> collisionIt = this.gameView.model.targets.iterator();
@@ -110,6 +128,8 @@ public class Target extends Sprite {
 			}
 		}
 	}
+	
+	// Checks if two sprites collide
 	
 	public static boolean checkTargetCollide(Sprite t1, Sprite t2) {
 		boolean leftCollide = (t1.x_pos > t2.x_pos && t1.x_pos < t2.x_pos + t2.width);

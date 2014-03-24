@@ -1,3 +1,8 @@
+/*
+ * Sprite class provides a basic outline for anything that will be drawn to the screen
+ * Mostly used as a basis for more specific classes
+ */
+
 import java.awt.Image;
 import java.awt.Graphics;
 
