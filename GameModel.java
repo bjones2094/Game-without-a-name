@@ -15,9 +15,7 @@ public class GameModel {
 	public int lives;
 	
 	public ArrayList<Target> targets;
-	public ArrayList<Sprite> bombs;	// Bombs do not have their own class since they only require the basic methods provided by the sprite class
-	
-	public static Image bombImage;
+	public ArrayList<Bomb> bombs;
 	
 	public int frameCounter;
 	
@@ -34,15 +32,13 @@ public class GameModel {
 		
 		this.rand = new Random();
 		
+		// Clickable Objects
+		
 		this.targets = new ArrayList<Target>();
-		this.bombs = new ArrayList<Sprite>();
-		try {
-			bombImage = ImageIO.read(new File("img/bomb.png"));
-		}
-		catch(Exception e) {
-			throw new IllegalArgumentException("Failed to open file");
-		}
+		this.bombs = new ArrayList<Bomb>();
 	}
+	
+	// Update called every 33ms
 	
 	public void update() {
 		this.frameCounter++;
@@ -62,26 +58,34 @@ public class GameModel {
 			}
 		}
 		
-		// Adds a bomb every 3 seconds (max of 10 bombs on screen), and shuffles bomb locations
+		// Adds a bomb every 3 seconds (max of 10 bombs on screen)
 		
 		if(this.frameCounter == 90) {
 			this.frameCounter = 0;
-			
-			Iterator<Sprite> it = this.bombs.iterator();
-			while(it.hasNext()) {
-				Sprite tempBomb = it.next();
-				tempBomb.setPos(this.rand.nextInt(this.viewWidth - tempBomb.width), this.rand.nextInt(this.viewHeight - tempBomb.height));
-			}
 		
 			if(this.bombs.size() < 10) {
-				this.bombs.add(new Sprite(this.rand.nextInt(this.viewWidth - 50), this.rand.nextInt(this.viewHeight - 50), this.bombImage));
+				this.bombs.add(new Bomb(this.rand.nextInt(this.viewWidth - 50), this.rand.nextInt(this.viewHeight - 50), this.gameView));
 			}
 		}
+	
+		// Update targets and bombs individually
 	
 		Iterator<Target> it = this.targets.iterator();
 		while(it.hasNext()) {
 			Target tempTarget = it.next();
 			tempTarget.update();
+		}
+		
+		Iterator<Bomb> it2 = this.bombs.iterator();
+		while(it2.hasNext()) {
+			Bomb tempBomb = it2.next();
+			tempBomb.update();
+			
+			// Remove exploded bombs
+			
+			if(tempBomb.isDead) {
+				it2.remove();
+			}
 		}
 	}
 	
@@ -94,9 +98,9 @@ public class GameModel {
 			tempTarget.draw(g);
 		}
 		
-		Iterator<Sprite> bombIt = this.bombs.iterator();
+		Iterator<Bomb> bombIt = this.bombs.iterator();
 		while(bombIt.hasNext()) {
-			Sprite tempBomb = bombIt.next();
+			Bomb tempBomb = bombIt.next();
 			tempBomb.draw(g);
 		}
 	}
@@ -128,12 +132,14 @@ public class GameModel {
 		
 		// Checks all bombs for clicks
 		
-		Iterator<Sprite> it2 = this.bombs.iterator();
+		Iterator<Bomb> it2 = this.bombs.iterator();
 		while(it2.hasNext()) {
-			Sprite tempBomb = it2.next();
+			Bomb tempBomb = it2.next();
 			if(checkMouseCollide(x, y, tempBomb)) {
-				it2.remove();
-				successClick = false;
+				if(!tempBomb.isDead) {
+					tempBomb.isTouched();
+					successClick = false;
+				}
 			}
 		}
 		if(successClick) {

@@ -13,7 +13,7 @@ public class Sprite {
 	public int width;
 	public int height;
 	
-	Image currentImage;
+	public Image currentImage;
 
 	public Sprite() {
 		this.x_pos = 0;

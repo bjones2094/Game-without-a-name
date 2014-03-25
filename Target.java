@@ -1,31 +1,21 @@
 /*
- * Target class is a child of the Sprite class, and is the main objective of the game.
+ * Target class is a child of the ClickObject class, and is the main objective of the game.
  * Targets should be clicked before they disappear.
  */
 
 import java.awt.Image;
 import javax.imageio.ImageIO;
 import java.io.File;
-import java.awt.Graphics;
-import java.util.Random;
-import java.util.Iterator;
 
-public class Target extends Sprite {
+public class Target extends ClickObject {
 	static Image lowImage;
 	static Image midImage;
 	static Image midHighImage;
 	static Image highImage;
 	
-	public int timesTouched;
-	
-	public Random rand;
-	
-	int frameCounter;
-	public int timeBeforeMove;
-	
-	public GameView gameView;
-	
 	public Target(int x, int y, GameView view) {
+		super(x, y, view);
+	
 		// Statically loads all images needed for targets on creation of first target
 	
 		try {
@@ -47,23 +37,9 @@ public class Target extends Sprite {
 		}
 		
 		this.setImage(this.lowImage);
-		
-		
-		this.timesTouched = 0;
-		
-		this.frameCounter = 0;
-		this.timeBeforeMove = 90;
-	
-		this.x_pos = x;
-		this.y_pos = y;
-		
-		this.width = 50;
-		this.height = 50;
-		
-		this.gameView = view;
-		
-		this.rand = new Random();
 	}
+	
+	// Update called every 33ms
 	
 	public void update() {
 		this.frameCounter++;
@@ -98,45 +74,5 @@ public class Target extends Sprite {
 			this.setImage(this.highImage);
 		}
 		this.relocate();
-	}
-	
-	// Moves target to new location and resets its counter
-	
-	public void relocate() {
-		this.frameCounter = 0;
-		this.setPos(this.rand.nextInt(this.gameView.getWidth() - this.width), this.rand.nextInt(this.gameView.getHeight() - this.height));
-		this.avoidTargetCollision();
-	}
-	
-	// Attempt at preventing target collisions (needs to be fixed)
-	
-	public void avoidTargetCollision() {
-		Iterator<Target> collisionIt = this.gameView.model.targets.iterator();
-		while(collisionIt.hasNext()) {
-			Target tempTarget = collisionIt.next();
-			if(tempTarget != this) {
-				while(checkTargetCollide(this, tempTarget)) {
-					this.setPos(this.rand.nextInt(this.gameView.getWidth() - this.width), this.rand.nextInt(this.gameView.getHeight() - this.height));
-				}
-			}
-		}
-		Iterator<Sprite> bombIt = this.gameView.model.bombs.iterator();
-		while(bombIt.hasNext()) {
-			Sprite tempBomb = bombIt.next();
-			while(checkTargetCollide(this, tempBomb)) {
-				this.setPos(this.rand.nextInt(this.gameView.getWidth() - this.width), this.rand.nextInt(this.gameView.getHeight() - this.height));
-			}
-		}
-	}
-	
-	// Checks if two sprites collide
-	
-	public static boolean checkTargetCollide(Sprite t1, Sprite t2) {
-		boolean leftCollide = (t1.x_pos > t2.x_pos && t1.x_pos < t2.x_pos + t2.width);
-		boolean rightCollide = (t1.x_pos + t1.width > t2.x_pos && t1.x_pos + t1.width < t2.x_pos + t2.width);
-		boolean topCollide = (t1.y_pos > t2.y_pos && t1.y_pos < t2.y_pos + t2.height);
-		boolean bottomCollide = (t1.y_pos + t1.height > t2.y_pos && t1.y_pos + t1.height < t2.y_pos + t2.height);
-		
-		return ((leftCollide || rightCollide) && (topCollide || bottomCollide));
 	}
 }
