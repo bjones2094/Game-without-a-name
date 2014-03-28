@@ -17,7 +17,10 @@ public class GameModel {
 	public ArrayList<Target> targets;
 	public ArrayList<Bomb> bombs;
 	
-	public int frameCounter;
+	public Target goldTarget;
+	
+	public int bombTimer;
+	public int goldTimer;
 	
 	public Random rand;
 	
@@ -28,7 +31,9 @@ public class GameModel {
 	public GameModel() {
 		this.score = 0;
 		this.lives = 5;
-		this.frameCounter = 0;
+		
+		this.bombTimer = 0;
+		this.goldTimer = 0;
 		
 		this.rand = new Random();
 		
@@ -41,7 +46,8 @@ public class GameModel {
 	// Update called every 33ms
 	
 	public void update() {
-		this.frameCounter++;
+		this.bombTimer++;
+		this.goldTimer++;
 	
 		this.viewWidth = this.gameView.getWidth();
 		this.viewHeight = this.gameView.getHeight();
@@ -60,11 +66,23 @@ public class GameModel {
 		
 		// Adds a bomb every 3 seconds (max of 10 bombs on screen)
 		
-		if(this.frameCounter == 90) {
-			this.frameCounter = 0;
-		
+		if(this.bombTimer == 90) {
+			this.bombTimer = 0;
 			if(this.bombs.size() < 10) {
-				this.bombs.add(new Bomb(this.rand.nextInt(this.viewWidth - 50), this.rand.nextInt(this.viewHeight - 50), this.gameView));
+				if(this.bombs.size() < this.score / 2) {
+					this.bombs.add(new Bomb(this.rand.nextInt(this.viewWidth - 50), this.rand.nextInt(this.viewHeight - 50), this.gameView));
+				}
+			}
+		}
+		
+		// Gold Target appears after 20 seconds
+		
+		if(this.goldTimer == 660) {
+			this.goldTimer = 0;
+			if(this.goldTarget == null) {
+				this.goldTarget = new Target(this.rand.nextInt(this.viewWidth - 50), this.rand.nextInt(this.viewHeight - 50), this.gameView);
+				this.goldTarget.setImage(Target.goldImage);
+				this.goldTarget.setTimesTouched(9);
 			}
 		}
 	
@@ -81,11 +99,15 @@ public class GameModel {
 			Bomb tempBomb = it2.next();
 			tempBomb.update();
 			
-			// Remove exploded bombs
+			// Remove dead bombs
 			
-			if(tempBomb.isDead) {
+			if(tempBomb.state() == ClickObject.State.dead) {
 				it2.remove();
 			}
+		}
+		
+		if(this.goldTarget != null) {
+			this.goldTarget.update();
 		}
 	}
 	
@@ -103,6 +125,10 @@ public class GameModel {
 			Bomb tempBomb = bombIt.next();
 			tempBomb.draw(g);
 		}
+		
+		if(this.goldTarget != null) {
+			this.goldTarget.draw(g);
+		}
 	}
 	
 	// Adds first target to the game
@@ -117,6 +143,8 @@ public class GameModel {
 	// Handles all mouse clicks
 	
 	public void mouseClicked(int x, int y) {
+		// successClick true if ClickObject is clicked
+	
 		boolean successClick = false;
 	
 		// Checks all targets for clicks
@@ -125,7 +153,33 @@ public class GameModel {
 		while(it.hasNext()) {
 			Target tempTarget = it.next();
 			if(checkMouseCollide(x, y, tempTarget)) {
+				// Switch statements suck
+			
+				if(tempTarget.state() == ClickObject.State.slow) {
+					this.addScore(1);
+				}
+				else if(tempTarget.state() == ClickObject.State.mid) {
+					this.addScore(2);
+				}
+				else if(tempTarget.state() == ClickObject.State.midFast) {
+					this.addScore(3);
+				}
+				else if(tempTarget.state() == ClickObject.State.fast) {
+					this.addScore(4);
+				}
 				tempTarget.isTouched();
+				successClick = true;
+				break;
+			}
+		}
+		
+		// Remove golden target if clicked
+		
+		if(this.goldTarget != null) {
+			if(checkMouseCollide(x, y, this.goldTarget)) {
+				this.goldTarget = null;
+				this.goldTimer = 0;
+				this.addScore(5);
 				successClick = true;
 			}
 		}
@@ -136,16 +190,15 @@ public class GameModel {
 		while(it2.hasNext()) {
 			Bomb tempBomb = it2.next();
 			if(checkMouseCollide(x, y, tempBomb)) {
-				if(!tempBomb.isDead) {
+				if(tempBomb.state() != ClickObject.State.dead) {
 					tempBomb.isTouched();
-					successClick = false;
+					this.loseLife();
+					successClick = true;
 				}
 			}
 		}
-		if(successClick) {
-			this.addScore(1);
-		}
-		else {
+		
+		if(!successClick) {
 			this.loseLife();
 		}
 	}
