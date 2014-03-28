@@ -13,6 +13,7 @@ public abstract class ClickObject extends Sprite {
 	int frameCounter;
 	int timesTouched;
 	int timeBeforeMove;
+	int timesMissed;
 	
 	GameView gameView;
 	
@@ -25,6 +26,7 @@ public abstract class ClickObject extends Sprite {
 		
 		this.frameCounter = 0;
 		this.timeBeforeMove = 90;
+		this.timesMissed = 0;
 	
 		this.x_pos = 0;
 		this.y_pos = 0;
@@ -44,6 +46,7 @@ public abstract class ClickObject extends Sprite {
 		
 		this.frameCounter = 0;
 		this.timeBeforeMove = 90;
+		this.timesMissed = 0;
 	
 		this.x_pos = x;
 		this.y_pos = y;

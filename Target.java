@@ -16,6 +16,10 @@ public class Target extends ClickObject {
 	static Image highImage;
 	static Image goldImage;
 	
+	// Gold target has special attributes
+	
+	public boolean isGold;
+	
 	public Target(int x, int y, GameView view) {
 		super(x, y, view);
 	
@@ -43,6 +47,8 @@ public class Target extends ClickObject {
 		}
 		
 		this.setImage(this.lowImage);
+		
+		this.isGold = false;
 	}
 	
 	// Update called every 33ms
@@ -60,6 +66,54 @@ public class Target extends ClickObject {
 		
 		if(this.frameCounter >= this.timeBeforeMove) {
 			this.relocate();
+			this.timesMissed++;
+			
+			// Targets slow down if they aren't clicked 
+			
+			int missesBeforeReset = 2;
+			
+			if(this.state() == ClickObject.State.slow) {
+				missesBeforeReset = 1;
+			}
+			else if(this.state() == ClickObject.State.mid) {
+				missesBeforeReset = 2;
+			}
+			else if(this.state() == ClickObject.State.midFast) {
+				missesBeforeReset = 3;
+			}
+			else if(this.state() == ClickObject.State.fast) {
+				missesBeforeReset = 5;
+			}
+			
+			if(this.timesMissed == missesBeforeReset) {
+				this.timesMissed = 0;
+				if(!this.isGold) {		// Gold targets maintain speed
+					if(this.timesTouched > 0) {
+						this.timesTouched--;
+					}
+				}
+			}
+		}
+		
+		// Targets change color the more they are touched
+		
+		if(this.timesTouched < 3) {
+			this.currentState = ClickObject.State.slow;
+			this.setImage(this.lowImage);
+		}
+		else if(this.timesTouched >= 3 && this.timesTouched < 6) {
+			this.currentState = ClickObject.State.mid;
+			this.setImage(this.midImage);
+		}
+		else if(this.timesTouched >= 6 && this.timesTouched < 9) {
+			this.currentState = ClickObject.State.midFast;
+			this.setImage(this.midHighImage);
+		}
+		else if(this.timesTouched >= 9) {
+			this.currentState = ClickObject.State.fast;
+			if(!this.isGold) {		// Gold targets stay gold
+				this.setImage(this.highImage);
+			}
 		}
 	}
 	
@@ -67,21 +121,6 @@ public class Target extends ClickObject {
 	
 	public void isTouched() {
 		this.timesTouched++;
-		
-		// Targets change color the more they are clicked
-		
-		if(this.timesTouched == 3) {
-			this.currentState = ClickObject.State.mid;
-			this.setImage(this.midImage);
-		}
-		else if(this.timesTouched == 6) {
-			this.currentState = ClickObject.State.midFast;
-			this.setImage(this.midHighImage);
-		}
-		else if(this.timesTouched == 9) {
-			this.currentState = ClickObject.State.fast;
-			this.setImage(this.highImage);
-		}
 		this.relocate();
 	}
 }

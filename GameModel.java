@@ -55,12 +55,10 @@ public class GameModel {
 		// Adds more targets to the game based on score (stops at 15 score)
 	
 		if(this.score < 15) {
-			if(this.score % 3 == 0) {
-				int Factor = this.score / 3;
-				int expectedSize = 1 + (Factor - 1) * Factor / 2;	// Some clever math to prevent continuously adding targets
-				if(this.targets.size() == expectedSize) {
-					this.addTargets(Factor);
-				}
+			int Factor = this.score / 3;
+			int expectedSize = 1 + (Factor - 1) * Factor / 2;	// Some clever math to prevent continuously adding targets
+			if(this.targets.size() == expectedSize) {
+				this.addTargets(Factor);
 			}
 		}
 		
@@ -83,6 +81,7 @@ public class GameModel {
 				this.goldTarget = new Target(this.rand.nextInt(this.viewWidth - 50), this.rand.nextInt(this.viewHeight - 50), this.gameView);
 				this.goldTarget.setImage(Target.goldImage);
 				this.goldTarget.setTimesTouched(9);
+				this.goldTarget.isGold = true;
 			}
 		}
 	

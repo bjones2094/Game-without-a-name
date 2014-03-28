@@ -11,8 +11,6 @@ public class Bomb extends ClickObject {
 	static Image regularImage;
 	static Image explodeImage;
 	
-	public boolean isExploded;
-	
 	public Bomb(int x, int y, GameView view) {
 		super(x, y, view);
 	
@@ -37,10 +35,11 @@ public class Bomb extends ClickObject {
 		this.frameCounter++;
 		
 		if(this.frameCounter >= timeBeforeMove) {
-			if(this.isExploded) {
+			if(this.timesTouched > 1) {
 				this.currentState = ClickObject.State.dead;
 			}
 			else {
+				this.timesMissed++;
 				this.relocate();
 			}
 		}
@@ -51,7 +50,6 @@ public class Bomb extends ClickObject {
 	public void isTouched() {
 		this.timesTouched++;
 		this.frameCounter = 0;
-		this.isExploded = true;
 		this.setImage(explodeImage);
 	}
 }
