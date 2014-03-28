@@ -12,7 +12,6 @@ public class Bomb extends ClickObject {
 	static Image explodeImage;
 	
 	public boolean isExploded;
-	public boolean isDead;		// Dead bombs will be removed by the model
 	
 	public Bomb(int x, int y, GameView view) {
 		super(x, y, view);
@@ -39,7 +38,7 @@ public class Bomb extends ClickObject {
 		
 		if(this.frameCounter >= timeBeforeMove) {
 			if(this.isExploded) {
-				this.isDead = true;
+				this.currentState = ClickObject.State.dead;
 			}
 			else {
 				this.relocate();

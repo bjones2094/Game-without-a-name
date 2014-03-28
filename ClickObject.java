@@ -6,6 +6,10 @@ import java.util.Random;
 import java.util.Iterator;
 
 public abstract class ClickObject extends Sprite {
+	// States that a ClickObject can be in
+
+	public enum State {slow, mid, midFast, fast, dead};
+
 	int frameCounter;
 	int timesTouched;
 	int timeBeforeMove;
@@ -13,6 +17,27 @@ public abstract class ClickObject extends Sprite {
 	GameView gameView;
 	
 	Random rand;
+	
+	public State currentState;
+	
+	public ClickObject() {
+		this.timesTouched = 0;
+		
+		this.frameCounter = 0;
+		this.timeBeforeMove = 90;
+	
+		this.x_pos = 0;
+		this.y_pos = 0;
+		
+		this.width = 50;
+		this.height = 50;
+		
+		this.currentState = State.slow;
+		
+		this.gameView = null;
+		
+		this.rand = new Random();
+	}
 	
 	public ClickObject(int x, int y, GameView view) {
 		this.timesTouched = 0;
@@ -25,6 +50,8 @@ public abstract class ClickObject extends Sprite {
 		
 		this.width = 50;
 		this.height = 50;
+		
+		this.currentState = State.slow;
 		
 		this.gameView = view;
 		
@@ -71,6 +98,16 @@ public abstract class ClickObject extends Sprite {
 		boolean bottomCollide = (t1.y_pos + t1.height > t2.y_pos && t1.y_pos + t1.height < t2.y_pos + t2.height);
 		
 		return ((leftCollide || rightCollide) && (topCollide || bottomCollide));
+	}
+	
+	// Allows for custom speeds
+	
+	public void setTimesTouched(int amount) {
+		this.timesTouched = amount;
+	}
+	
+	public State state() {
+		return this.currentState;
 	}
 	
 	// Abstract methods needed for all child classes

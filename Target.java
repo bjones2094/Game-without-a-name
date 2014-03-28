@@ -8,10 +8,13 @@ import javax.imageio.ImageIO;
 import java.io.File;
 
 public class Target extends ClickObject {
+	// All images needed for targets
+
 	static Image lowImage;
 	static Image midImage;
 	static Image midHighImage;
 	static Image highImage;
+	static Image goldImage;
 	
 	public Target(int x, int y, GameView view) {
 		super(x, y, view);
@@ -30,6 +33,9 @@ public class Target extends ClickObject {
 			}
 			if(this.highImage == null) {
 				this.highImage = ImageIO.read(new File("img/targetHigh.png"));
+			}
+			if(this.goldImage == null) {
+				this.goldImage = ImageIO.read(new File("img/goldTarget.png"));
 			}
 		}
 		catch(Exception e) {
@@ -65,12 +71,15 @@ public class Target extends ClickObject {
 		// Targets change color the more they are clicked
 		
 		if(this.timesTouched == 3) {
+			this.currentState = ClickObject.State.mid;
 			this.setImage(this.midImage);
 		}
 		else if(this.timesTouched == 6) {
+			this.currentState = ClickObject.State.midFast;
 			this.setImage(this.midHighImage);
 		}
 		else if(this.timesTouched == 9) {
+			this.currentState = ClickObject.State.fast;
 			this.setImage(this.highImage);
 		}
 		this.relocate();
