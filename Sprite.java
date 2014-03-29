@@ -44,6 +44,11 @@ public class Sprite {
 		this.y_pos = y;
 	}
 	
+	public void move(int x, int y) {
+		this.x_pos += x;
+		this.y_pos += y;
+	}
+	
 	public void setDimen(int w, int h) {
 		this.width = w;
 		this.height = h;
