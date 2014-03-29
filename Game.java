@@ -36,7 +36,7 @@ public class Game extends JFrame {
 				Game.this.render();
 			}
 		};
-		new Timer(33, gameUpdater).start();
+		new Timer(30, gameUpdater).start();
 	}
 	
 	public void update() {

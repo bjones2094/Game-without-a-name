@@ -51,7 +51,7 @@ public class Target extends ClickObject {
 		this.isGold = false;
 	}
 	
-	// Update called every 33ms
+	// Update called every 30ms
 	
 	public void update() {
 		this.frameCounter++;
@@ -62,6 +62,27 @@ public class Target extends ClickObject {
 			
 		if(this.timeBeforeMove < 10) {
 			this.timeBeforeMove = 10;
+		}
+		
+		// Targets change color the more they are touched
+		
+		if(this.timesTouched < 3) {
+			this.currentState = ClickObject.State.slow;
+			this.setImage(this.lowImage);
+		}
+		else if(this.timesTouched >= 3 && this.timesTouched < 6) {
+			this.currentState = ClickObject.State.mid;
+			this.setImage(this.midImage);
+		}
+		else if(this.timesTouched >= 6 && this.timesTouched < 9) {
+			this.currentState = ClickObject.State.midFast;
+			this.setImage(this.midHighImage);
+		}
+		else if(this.timesTouched >= 9) {
+			this.currentState = ClickObject.State.fast;
+			if(!this.isGold) {		// Gold targets stay gold
+				this.setImage(this.highImage);
+			}
 		}
 		
 		if(this.frameCounter >= this.timeBeforeMove) {
@@ -85,34 +106,23 @@ public class Target extends ClickObject {
 				missesBeforeReset = 5;
 			}
 			
+			if(this.isGold) {		// Special case for gold target
+				missesBeforeReset = 10;
+			}
+			
 			if(this.timesMissed == missesBeforeReset) {
 				this.timesMissed = 0;
-				if(!this.isGold) {		// Gold targets maintain speed
+				
+				// Gold targets die instead of slowing down
+				
+				if(this.isGold) {
+					this.currentState = ClickObject.State.dead;
+				}
+				else {
 					if(this.timesTouched > 0) {
 						this.timesTouched--;
 					}
 				}
-			}
-		}
-		
-		// Targets change color the more they are touched
-		
-		if(this.timesTouched < 3) {
-			this.currentState = ClickObject.State.slow;
-			this.setImage(this.lowImage);
-		}
-		else if(this.timesTouched >= 3 && this.timesTouched < 6) {
-			this.currentState = ClickObject.State.mid;
-			this.setImage(this.midImage);
-		}
-		else if(this.timesTouched >= 6 && this.timesTouched < 9) {
-			this.currentState = ClickObject.State.midFast;
-			this.setImage(this.midHighImage);
-		}
-		else if(this.timesTouched >= 9) {
-			this.currentState = ClickObject.State.fast;
-			if(!this.isGold) {		// Gold targets stay gold
-				this.setImage(this.highImage);
 			}
 		}
 	}

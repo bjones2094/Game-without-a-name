@@ -43,7 +43,7 @@ public class GameModel {
 		this.bombs = new ArrayList<Bomb>();
 	}
 	
-	// Update called every 33ms
+	// Update called every 30ms
 	
 	public void update() {
 		this.bombTimer++;
@@ -57,18 +57,18 @@ public class GameModel {
 		if(this.score < 15) {
 			int Factor = this.score / 3;
 			int expectedSize = 1 + (Factor - 1) * Factor / 2;	// Some clever math to prevent continuously adding targets
-			if(this.targets.size() == expectedSize) {
+			if(this.targets.size() <= expectedSize) {
 				this.addTargets(Factor);
 			}
 		}
 		
-		// Adds a bomb every 3 seconds (max of 10 bombs on screen)
+		// Adds a bomb every second based on score(max of 10 bombs on screen)
 		
-		if(this.bombTimer == 90) {
+		if(this.bombTimer == 30) {
 			this.bombTimer = 0;
 			if(this.bombs.size() < 10) {
 				if(this.bombs.size() < this.score / 2) {
-					this.bombs.add(new Bomb(this.rand.nextInt(this.viewWidth - 50), this.rand.nextInt(this.viewHeight - 50), this.gameView));
+					this.bombs.add(new Bomb(this.viewWidth + 10, this.rand.nextInt(this.viewHeight - 50), this.gameView));
 				}
 			}
 		}
@@ -107,6 +107,10 @@ public class GameModel {
 		
 		if(this.goldTarget != null) {
 			this.goldTarget.update();
+			
+			if(this.goldTarget.state() == ClickObject.State.dead) {
+				this.goldTarget = null;
+			}
 		}
 	}
 	
