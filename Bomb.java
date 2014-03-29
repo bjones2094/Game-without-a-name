@@ -29,19 +29,24 @@ public class Bomb extends ClickObject {
 		this.currentImage = regularImage;
 	}
 	
-	// Update called every 33ms
+	// Update called every 30ms
 	
 	public void update() {
 		this.frameCounter++;
 		
 		if(this.frameCounter >= timeBeforeMove) {
-			if(this.timesTouched > 1) {
+			this.frameCounter = 0;
+			if(this.timesTouched > 0) {
 				this.currentState = ClickObject.State.dead;
 			}
-			else {
-				this.timesMissed++;
-				this.relocate();
-			}
+		}
+		
+		if(this.x_pos <= -50) {
+			this.currentState = ClickObject.State.dead;
+		}
+		
+		if(this.timesTouched == 0) {
+			this.move(-10, 0);
 		}
 	}
 	
