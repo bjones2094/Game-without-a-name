@@ -35,10 +35,7 @@ public class Bomb extends ClickObject {
 		this.frameCounter++;
 		
 		if(this.frameCounter >= timeBeforeMove) {
-			this.frameCounter = 0;
-			if(this.timesTouched > 0) {
-				this.currentState = ClickObject.State.dead;
-			}
+			this.isMissed();
 		}
 		
 		if(this.x_pos <= -50) {
@@ -52,9 +49,18 @@ public class Bomb extends ClickObject {
 	
 	// Called when user clicks a bomb
 	
-	public void isTouched() {
+	public void isClicked() {
 		this.timesTouched++;
 		this.frameCounter = 0;
 		this.setImage(explodeImage);
+	}
+	
+	public void isMissed() {
+		this.timesMissed++;
+		this.frameCounter = 0;
+		
+		if(this.timesTouched > 0) {
+			this.currentState = ClickObject.State.dead;
+		}
 	}
 }

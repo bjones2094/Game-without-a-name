@@ -14,7 +14,6 @@ public class Target extends ClickObject {
 	static Image midImage;
 	static Image midHighImage;
 	static Image highImage;
-	static Image goldImage;
 	
 	// Gold target has special attributes
 	
@@ -22,33 +21,7 @@ public class Target extends ClickObject {
 	
 	public Target(int x, int y, GameView view) {
 		super(x, y, view);
-	
-		// Statically loads all images needed for targets on creation of first target
-	
-		try {
-			if(this.lowImage == null) {
-				this.lowImage = ImageIO.read(new File("img/targetLow.png"));
-			}
-			if(this.midImage == null) {
-				this.midImage = ImageIO.read(new File("img/targetMid.png"));
-			}
-			if(this.midHighImage == null) {
-				this.midHighImage = ImageIO.read(new File("img/targetMidHigh.png"));
-			}
-			if(this.highImage == null) {
-				this.highImage = ImageIO.read(new File("img/targetHigh.png"));
-			}
-			if(this.goldImage == null) {
-				this.goldImage = ImageIO.read(new File("img/goldTarget.png"));
-			}
-		}
-		catch(Exception e) {
-			throw new IllegalArgumentException("Failed to load file");
-		}
-		
-		this.setImage(this.lowImage);
-		
-		this.isGold = false;
+		this.loadImages();
 	}
 	
 	// Update called every 30ms
@@ -56,16 +29,63 @@ public class Target extends ClickObject {
 	public void update() {
 		this.frameCounter++;
 		
-		// Targets move faster as they are clicked more (minimum 10ms between switches)
-		
-		this.timeBeforeMove = 90 - this.timesTouched * 8;
-			
-		if(this.timeBeforeMove < 10) {
-			this.timeBeforeMove = 10;
+		if(this.frameCounter >= this.timeBeforeMove) {
+			this.isMissed();
 		}
 		
-		// Targets change color the more they are touched
+		if(this.state() != ClickObject.State.dead) {	// Dead targets don't change state or image
+			this.updateState();
+		}
+	}
+	
+	// Called when user successfully clicks target
+	
+	public void isClicked() {
+		this.timesTouched++;
+		this.relocate();
+	}
+	
+	// Called when target isn't clicked in time
+	
+	public void isMissed() {
+		this.timesMissed++;
 		
+		// Targets slow down if not clicked
+		
+		int missesBeforeReset;
+					
+		if(this.state() == ClickObject.State.slow) {
+			missesBeforeReset = 1;
+		}
+		else if(this.state() == ClickObject.State.mid) {
+			missesBeforeReset = 2;
+		}
+		else if(this.state() == ClickObject.State.midFast) {
+			missesBeforeReset = 3;
+		}
+		else if(this.state() == ClickObject.State.fast) {
+			missesBeforeReset = 5;
+		}
+		else {
+			missesBeforeReset = 0;
+		}
+		
+		if(this.timesMissed == missesBeforeReset) {
+			this.timesMissed = 0;
+			
+			if(this.timesTouched > 0) {
+				this.timesTouched--;
+			}
+		}
+		
+		this.relocate();
+	}
+	
+	// Targets change color, speed, and state with more clicks
+	
+	public void updateState() {
+		this.timeBeforeMove = 90 - this.timesTouched * 8;
+	
 		if(this.timesTouched < 3) {
 			this.currentState = ClickObject.State.slow;
 			this.setImage(this.lowImage);
@@ -80,57 +100,29 @@ public class Target extends ClickObject {
 		}
 		else if(this.timesTouched >= 9) {
 			this.currentState = ClickObject.State.fast;
-			if(!this.isGold) {		// Gold targets stay gold
-				this.setImage(this.highImage);
-			}
-		}
-		
-		if(this.frameCounter >= this.timeBeforeMove) {
-			this.relocate();
-			this.timesMissed++;
-			
-			// Targets slow down if they aren't clicked 
-			
-			int missesBeforeReset = 2;
-			
-			if(this.state() == ClickObject.State.slow) {
-				missesBeforeReset = 1;
-			}
-			else if(this.state() == ClickObject.State.mid) {
-				missesBeforeReset = 2;
-			}
-			else if(this.state() == ClickObject.State.midFast) {
-				missesBeforeReset = 3;
-			}
-			else if(this.state() == ClickObject.State.fast) {
-				missesBeforeReset = 5;
-			}
-			
-			if(this.isGold) {		// Special case for gold target
-				missesBeforeReset = 10;
-			}
-			
-			if(this.timesMissed == missesBeforeReset) {
-				this.timesMissed = 0;
-				
-				// Gold targets die instead of slowing down
-				
-				if(this.isGold) {
-					this.currentState = ClickObject.State.dead;
-				}
-				else {
-					if(this.timesTouched > 0) {
-						this.timesTouched--;
-					}
-				}
-			}
+			this.setImage(this.highImage);
 		}
 	}
 	
-	// Called when user successfully clicks target
+	// Statically loads all images needed for targets on creation of first target
 	
-	public void isTouched() {
-		this.timesTouched++;
-		this.relocate();
+	public void loadImages() {
+		try {
+			if(this.lowImage == null) {
+				this.lowImage = ImageIO.read(new File("img/targetLow.png"));
+			}
+			if(this.midImage == null) {
+				this.midImage = ImageIO.read(new File("img/targetMid.png"));
+			}
+			if(this.midHighImage == null) {
+				this.midHighImage = ImageIO.read(new File("img/targetMidHigh.png"));
+			}
+			if(this.highImage == null) {
+				this.highImage = ImageIO.read(new File("img/targetHigh.png"));
+			}
+		}
+		catch(Exception e) {
+			throw new IllegalArgumentException("Failed to load file");
+		}
 	}
 }

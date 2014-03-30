@@ -116,5 +116,6 @@ public abstract class ClickObject extends Sprite {
 	// Abstract methods needed for all child classes
 	
 	public abstract void update();
-	public abstract void isTouched();
+	public abstract void isClicked();
+	public abstract void isMissed();
 }
