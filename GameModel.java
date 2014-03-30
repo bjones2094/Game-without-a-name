@@ -17,7 +17,7 @@ public class GameModel {
 	public ArrayList<Target> targets;
 	public ArrayList<Bomb> bombs;
 	
-	public Target goldTarget;
+	public GoldTarget goldTarget;
 	
 	public int bombTimer;
 	public int goldTimer;
@@ -75,13 +75,10 @@ public class GameModel {
 		
 		// Gold Target appears after 20 seconds
 		
-		if(this.goldTimer == 660) {
+		if(this.goldTimer == 600) {
 			this.goldTimer = 0;
 			if(this.goldTarget == null) {
-				this.goldTarget = new Target(this.rand.nextInt(this.viewWidth - 50), this.rand.nextInt(this.viewHeight - 50), this.gameView);
-				this.goldTarget.setImage(Target.goldImage);
-				this.goldTarget.setTimesTouched(9);
-				this.goldTarget.isGold = true;
+				this.goldTarget = new GoldTarget(this.rand.nextInt(this.viewWidth - 50), this.rand.nextInt(this.viewHeight - 50), this.gameView);
 			}
 		}
 	
@@ -170,7 +167,7 @@ public class GameModel {
 				else if(tempTarget.state() == ClickObject.State.fast) {
 					this.addScore(4);
 				}
-				tempTarget.isTouched();
+				tempTarget.isClicked();
 				successClick = true;
 				break;
 			}
@@ -180,8 +177,8 @@ public class GameModel {
 		
 		if(this.goldTarget != null) {
 			if(checkMouseCollide(x, y, this.goldTarget)) {
-				this.goldTarget = null;
 				this.goldTimer = 0;
+				this.goldTarget = null;
 				this.addScore(5);
 				successClick = true;
 			}
@@ -194,7 +191,7 @@ public class GameModel {
 			Bomb tempBomb = it2.next();
 			if(checkMouseCollide(x, y, tempBomb)) {
 				if(tempBomb.state() != ClickObject.State.dead) {
-					tempBomb.isTouched();
+					tempBomb.isClicked();
 					this.loseLife();
 					successClick = true;
 				}
