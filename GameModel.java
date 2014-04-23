@@ -54,8 +54,8 @@ public class GameModel {
 	
 		// Adds more targets to the game based on score (stops at 15 score)
 	
-		if(this.score < 15) {
-			int Factor = this.score / 3;
+		if(this.score < 25) {
+			int Factor = this.score / 5;
 			int expectedSize = 1 + (Factor - 1) * Factor / 2;	// Some clever math to prevent continuously adding targets
 			if(this.targets.size() <= expectedSize) {
 				this.addTargets(Factor);
@@ -64,11 +64,11 @@ public class GameModel {
 		
 		// Adds a bomb every second based on score(max of 10 bombs on screen)
 		
-		if(this.bombTimer == 30) {
+		if(this.bombTimer == 15) {
 			this.bombTimer = 0;
-			if(this.bombs.size() < 10) {
+			if(this.bombs.size() < 15) {
 				if(this.bombs.size() < this.score / 2) {
-					this.bombs.add(new Bomb(this.viewWidth + 10, this.rand.nextInt(this.viewHeight - 50), this.gameView));
+					this.addBombs(1);
 				}
 			}
 		}
@@ -88,6 +88,12 @@ public class GameModel {
 		while(it.hasNext()) {
 			Target tempTarget = it.next();
 			tempTarget.update();
+			
+			// Remove dead targets
+			
+			if(tempTarget.state() == ClickObject.State.dead) {
+				it.remove();
+			}
 		}
 		
 		Iterator<Bomb> it2 = this.bombs.iterator();
@@ -104,6 +110,8 @@ public class GameModel {
 		
 		if(this.goldTarget != null) {
 			this.goldTarget.update();
+			
+			// Remove dead target
 			
 			if(this.goldTarget.state() == ClickObject.State.dead) {
 				this.goldTarget = null;
@@ -153,6 +161,7 @@ public class GameModel {
 		while(it.hasNext()) {
 			Target tempTarget = it.next();
 			if(checkMouseCollide(x, y, tempTarget)) {
+			
 				// Switch statements suck
 			
 				if(tempTarget.state() == ClickObject.State.slow) {
@@ -167,6 +176,7 @@ public class GameModel {
 				else if(tempTarget.state() == ClickObject.State.fast) {
 					this.addScore(4);
 				}
+				
 				tempTarget.isClicked();
 				successClick = true;
 				break;
@@ -178,7 +188,7 @@ public class GameModel {
 		if(this.goldTarget != null) {
 			if(checkMouseCollide(x, y, this.goldTarget)) {
 				this.goldTimer = 0;
-				this.goldTarget = null;
+				this.goldTarget.isClicked();
 				this.addScore(5);
 				successClick = true;
 			}
@@ -191,9 +201,11 @@ public class GameModel {
 			Bomb tempBomb = it2.next();
 			if(checkMouseCollide(x, y, tempBomb)) {
 				if(tempBomb.state() != ClickObject.State.dead) {
-					tempBomb.isClicked();
 					this.loseLife();
+					
+					tempBomb.isClicked();
 					successClick = true;
+					break;
 				}
 			}
 		}
@@ -240,6 +252,12 @@ public class GameModel {
 	public void addTargets(int amount) {
 		for(int i = 0; i < amount; i++) {
 			this.targets.add(new Target(this.rand.nextInt(this.viewWidth - 50), this.rand.nextInt(this.viewHeight - 50), this.gameView));
+		}
+	}
+	
+	public void addBombs(int amount) {
+		for(int i = 0; i < amount; i++) {
+			this.bombs.add(new Bomb(this.viewWidth + 10, this.rand.nextInt(this.viewHeight - 50), this.gameView));
 		}
 	}
 }

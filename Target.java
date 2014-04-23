@@ -32,16 +32,13 @@ public class Target extends ClickObject {
 		if(this.frameCounter >= this.timeBeforeMove) {
 			this.isMissed();
 		}
-		
-		if(this.state() != ClickObject.State.dead) {	// Dead targets don't change state or image
-			this.updateState();
-		}
 	}
 	
 	// Called when user successfully clicks target
 	
 	public void isClicked() {
 		this.timesTouched++;
+		this.updateState();
 		this.relocate();
 	}
 	
@@ -75,6 +72,7 @@ public class Target extends ClickObject {
 			
 			if(this.timesTouched > 0) {
 				this.timesTouched--;
+				this.updateState();
 			}
 		}
 		
@@ -124,5 +122,7 @@ public class Target extends ClickObject {
 		catch(Exception e) {
 			throw new IllegalArgumentException("Failed to load file");
 		}
+		
+		this.setImage(lowImage);
 	}
 }

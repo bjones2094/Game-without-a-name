@@ -7,21 +7,14 @@ public class GoldTarget extends Target {
 
 	public GoldTarget(int x, int y, GameView view) {
 		super(x, y, view);
-		
 		this.timeBeforeMove = 15;
-		
 		this.currentState = ClickObject.State.fast;
-		
-		try {
-			if(goldImage == null) {
-				goldImage = ImageIO.read(new File("img/goldTarget.png"));
-			}
-		}
-		catch(Exception e) {
-			throw new IllegalArgumentException("Failed to load file");
-		}
-		
-		this.setImage(goldImage);
+	}
+	
+	@Override
+	public void isClicked() {
+		this.timesTouched++;
+		this.currentState = ClickObject.State.dead;
 	}
 	
 	@Override
@@ -36,7 +29,16 @@ public class GoldTarget extends Target {
 	}
 	
 	@Override
-	public void updateState() {
-		// Do nothing
+	public void loadImages() {
+		try {
+			if(goldImage == null) {
+				goldImage = ImageIO.read(new File("img/goldTarget.png"));
+			}
+		}
+		catch(Exception e) {
+			throw new IllegalArgumentException("Failed to load file");
+		}
+		
+		this.setImage(goldImage);
 	}
 }

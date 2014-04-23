@@ -1,5 +1,5 @@
 /*
- * Unnamed Game v0.2
+ * Unnamed Game v0.4?
  * Author: Brian Jones
  */
 

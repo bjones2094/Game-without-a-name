@@ -11,6 +11,8 @@ public class Bomb extends ClickObject {
 	static Image regularImage;
 	static Image explodeImage;
 	
+	public int velocity;
+	
 	public Bomb(int x, int y, GameView view) {
 		super(x, y, view);
 	
@@ -27,6 +29,8 @@ public class Bomb extends ClickObject {
 		}
 		
 		this.currentImage = regularImage;
+		
+		this.velocity = -5;
 	}
 	
 	// Update called every 30ms
@@ -38,12 +42,15 @@ public class Bomb extends ClickObject {
 			this.isMissed();
 		}
 		
-		if(this.x_pos <= -50) {
-			this.currentState = ClickObject.State.dead;
+		if(this.x_pos <= 0) {
+			this.velocity = 5;
+		}
+		else if(this.x_pos >= this.gameView.getWidth() - this.width) {
+			this.velocity = -5;
 		}
 		
 		if(this.timesTouched == 0) {
-			this.move(-10, 0);
+			this.move(this.velocity, 0);
 		}
 	}
 	
